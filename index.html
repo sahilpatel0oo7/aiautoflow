@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="aiautoflow.io builds AI systems for clinics that reply to every patient enquiry within 60 seconds and book appointments automatically.">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>aiautoflow.io</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one left-aligned column threaded by a vertical "wire" with a node at each section, like a workflow canvas; the hero's right side holds the live 3D flow. Single committed dark look (brand navy). */
+:root {
+  color-scheme: dark;
+  --bg: #0B1F3A;
+  --bg-deep: #071528;
+  --surface: #132C50;
+  --surface-2: #1A3A68;
+  --fg: #F2F6FC;
+  --muted: #A9BAD3;
+  --accent: #4F8DFF;
+  --accent-strong: #2563EB;
+  --warn: #FF8A80;
+  --line: rgba(169, 186, 211, 0.22);
+  --display: "Bricolage Grotesque", "Arial Black", Arial, sans-serif;
+  --body: "Figtree", "Segoe UI", Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --wrap: 1120px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 17px; line-height: 1.6; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: var(--wrap); margin-inline: auto; padding-inline: 20px; }
+
+.nav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: rgba(11, 31, 58, 0.88); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.nav .wrap { display: flex; align-items: center; gap: 20px; padding-block: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-family: var(--display); font-weight: 700; font-size: 20px; letter-spacing: -0.01em; }
+.brand svg { width: 34px; height: 34px; flex: none; }
+.brand i { font-style: normal; color: var(--accent); }
+.nav nav { display: flex; gap: 22px; margin-left: auto; font-size: 15px; }
+.nav nav a { text-decoration: none; color: var(--muted); }
+.nav nav a:hover { color: var(--fg); }
+.btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 22px; border-radius: 999px; background: var(--accent); color: var(--bg-deep); font-weight: 600; text-decoration: none; border: 0; font: 600 16px var(--body); cursor: pointer; transition: transform .15s ease, background .15s ease; }
+.btn:hover { background: #76A6FF; transform: translateY(-1px); }
+.btn.ghost { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 1.5px var(--line); }
+.btn.ghost:hover { box-shadow: inset 0 0 0 1.5px var(--accent); background: transparent; }
+.nav .btn { padding: 9px 18px; font-size: 15px; }
+@media (max-width: 720px) { .nav nav { display: none; } .nav .btn { margin-left: auto; } }
+
+.hero { position: relative; overflow: hidden; background: radial-gradient(900px 500px at 78% 30%, rgba(79, 141, 255, 0.16), transparent 70%), var(--bg); }
+.hero .wrap { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 24px; align-items: center; padding-block: 64px 72px; }
+.hero-copy { min-width: 0; position: relative; z-index: 2; }
+.eyebrow { font: 500 13px var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin: 0 0 18px; }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(40px, 6.2vw, 76px); line-height: 1.02; letter-spacing: -0.025em; margin: 0 0 22px; text-wrap: balance; }
+h1 em { font-style: normal; color: var(--accent); }
+.lede { font-size: 19px; color: var(--muted); max-width: 34em; margin: 0 0 30px; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 12px; }
+.stage { position: relative; min-width: 0; aspect-ratio: 5 / 4; max-width: 100%; }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.stage-note { position: absolute; left: 0; bottom: 0; font: 500 12px var(--mono); color: var(--muted); letter-spacing: 0.04em; }
+.fallback { position: absolute; inset: 0; display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: 10px; }
+.fallback span { font: 500 14px var(--mono); padding: 12px 16px; border-radius: 12px; background: var(--surface); border: 1px solid var(--accent); }
+@media (max-width: 860px) { .hero .wrap { grid-template-columns: minmax(0, 1fr); padding-block: 44px 36px; } .stage { aspect-ratio: 4 / 3; } }
+
+main { position: relative; }
+section { padding-block: 72px; border-top: 1px solid var(--line); }
+.thread { position: relative; padding-left: 34px; }
+.thread::before { content: ""; position: absolute; left: 7px; top: 14px; bottom: -72px; width: 2px; background: linear-gradient(var(--accent), rgba(79, 141, 255, 0.12)); }
+.thread::after { content: ""; position: absolute; left: 0; top: 8px; width: 16px; height: 16px; border-radius: 5px; background: var(--bg); border: 2px solid var(--accent); }
+section:last-of-type .thread::before { bottom: 0; }
+h2 { font-family: var(--display); font-weight: 700; font-size: clamp(30px, 4vw, 46px); line-height: 1.08; letter-spacing: -0.02em; margin: 0 0 14px; text-wrap: balance; }
+.sub { color: var(--muted); max-width: 38em; margin: 0 0 36px; }
+h3 { font-family: var(--display); font-weight: 700; font-size: 21px; margin: 0 0 6px; letter-spacing: -0.01em; }
+p { margin: 0; }
+
+.pains { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-block: 1px solid var(--line); }
+.pains div { padding: 22px 22px 22px 0; min-width: 0; }
+.pains div + div { border-left: 1px solid var(--line); padding-left: 22px; }
+.pains b { display: block; font-family: var(--display); font-size: 20px; margin-bottom: 4px; }
+.pains span { color: var(--muted); font-size: 16px; }
+@media (max-width: 720px) { .pains { grid-template-columns: minmax(0, 1fr); } .pains div + div { border-left: 0; border-top: 1px solid var(--line); padding-left: 0; } }
+
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; counter-reset: s; }
+.steps li { counter-increment: s; min-width: 0; padding-top: 18px; border-top: 2px solid var(--accent); }
+.steps li::before { content: "0" counter(s); display: block; font: 500 13px var(--mono); color: var(--accent); letter-spacing: 0.1em; margin-bottom: 10px; }
+.steps p { color: var(--muted); font-size: 16px; }
+@media (max-width: 860px) { .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .steps { grid-template-columns: minmax(0, 1fr); } }
+
+.services { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; perspective: 1200px; }
+.card { min-width: 0; background: linear-gradient(160deg, var(--surface-2), var(--surface)); border-radius: 18px; padding: 26px; transform-style: preserve-3d; transition: transform .2s ease, box-shadow .2s ease; box-shadow: 0 10px 30px rgba(3, 10, 22, 0.35); will-change: transform; }
+.card .tag { display: inline-block; font: 500 12px var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; transform: translateZ(24px); }
+.card h3, .card p { transform: translateZ(14px); }
+.card p { color: var(--muted); font-size: 16px; }
+@media (max-width: 720px) { .services { grid-template-columns: minmax(0, 1fr); } }
+
+.demo { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 36px; align-items: start; }
+.figure { font-family: var(--display); font-weight: 800; font-size: clamp(90px, 14vw, 170px); line-height: 0.9; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.figure small { font-size: 0.3em; color: var(--accent); letter-spacing: -0.01em; margin-left: 8px; }
+.pill { display: inline-block; font: 500 12px var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); border: 1.5px solid var(--accent); border-radius: 999px; padding: 5px 12px; margin-bottom: 18px; }
+.phone { min-width: 0; background: var(--bg-deep); border: 1px solid var(--line); border-radius: 22px; padding: 18px; }
+.phone-head { display: flex; justify-content: space-between; gap: 12px; font: 500 12px var(--mono); color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.chat { display: flex; flex-direction: column; gap: 10px; min-height: 250px; padding-block: 16px; }
+.msg { max-width: 84%; padding: 11px 15px; border-radius: 16px; font-size: 16px; line-height: 1.45; overflow-wrap: anywhere; animation: rise .3s ease both; }
+.msg.in { align-self: flex-start; background: var(--surface); }
+.msg.out { align-self: flex-end; background: var(--accent); color: var(--bg-deep); }
+.msg.meta { align-self: flex-end; background: none; padding: 0; font: 500 12px var(--mono); color: var(--accent); }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 14px; border-top: 1px solid var(--line); }
+.chip { font: 500 15px var(--body); color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 9px 14px; cursor: pointer; }
+.chip:hover { border-color: var(--accent); }
+@media (max-width: 860px) { .demo { grid-template-columns: minmax(0, 1fr); } }
+
+.start { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.start div { min-width: 0; padding: 22px; border: 1px solid var(--line); border-radius: 16px; }
+.start .when { font: 500 12px var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+.start p { color: var(--muted); font-size: 16px; }
+@media (max-width: 720px) { .start { grid-template-columns: minmax(0, 1fr); } }
+
+.faq { max-width: 760px; }
+.faq details { border-bottom: 1px solid var(--line); padding-block: 16px; }
+.faq summary { cursor: pointer; font-family: var(--display); font-weight: 700; font-size: 19px; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; color: var(--accent); font-family: var(--mono); }
+.faq details[open] summary::after { content: "\2212"; }
+.faq details p { color: var(--muted); padding-top: 10px; max-width: 60ch; }
+
+.contact { background: linear-gradient(180deg, var(--bg), var(--bg-deep)); }
+.contact h2 { font-size: clamp(34px, 5vw, 58px); }
+.keyword { font: 500 0.9em var(--mono); background: var(--surface); border: 1px solid var(--accent); border-radius: 8px; padding: 2px 10px; white-space: nowrap; }
+footer { border-top: 1px solid var(--line); background: var(--bg-deep); color: var(--muted); font-size: 14px; }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; padding-block: 22px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .msg { animation: none; } .card, .btn { transition: none; } }
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="aiautoflow.io home">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="6" width="40" height="28" rx="8" fill="#FFFFFF"/><polygon points="13,33 21,33 11,43" fill="#FFFFFF"/><polygon points="27.1,9.2 16.7,22.2 23.4,22.2 20.9,31.1 31.7,18 25,18" fill="#2563EB"/></svg>
+      <span>aiautoflow<i>.io</i></span>
+    </a>
+    <nav aria-label="Sections">
+      <a href="#how">How it works</a>
+      <a href="#services">What we build</a>
+      <a href="#demo">Demo</a>
+      <a href="#faq">Questions</a>
+    </nav>
+    <a class="btn" href="#contact" data-book>Book a demo</a>
+  </div>
+</header>
+
+<div class="hero" id="top">
+  <div class="wrap">
+    <div class="hero-copy">
+      <p class="eyebrow">AI automation for clinics</p>
+      <h1>Every patient enquiry answered in <em>60 seconds.</em></h1>
+      <p class="lede">We build systems that reply on WhatsApp and Instagram, answer the usual questions, book the appointment, and keep every enquiry in one sheet. They work at night and on Sundays too.</p>
+      <div class="cta-row">
+        <a class="btn" href="#contact" data-book>Book a free 15-minute demo</a>
+        <a class="btn ghost" href="#how">See how it works</a>
+      </div>
+    </div>
+    <div class="stage" id="stage" aria-label="3D diagram of an enquiry flowing through the system: enquiry, AI reply, lead score, booking, and sheet">
+      <div class="fallback" id="fallback" hidden><span>Enquiry</span><span>AI reply</span><span>Score</span><span>Booking</span><span>Sheet</span></div>
+      <span class="stage-note">Move your pointer to turn the flow</span>
+    </div>
+  </div>
+</div>
+
+<main>
+  <section id="why">
+    <div class="wrap"><div class="thread">
+      <h2>Patients book with whoever answers first</h2>
+      <p class="sub">Most clinics lose enquiries without noticing, because nobody sees the patient who went elsewhere.</p>
+      <div class="pains">
+        <div><b>They message several clinics</b><span>The same question goes to two or three places at once.</span></div>
+        <div><b>Replies wait for free time</b><span>Reception answers between patients, often hours later.</span></div>
+        <div><b>Night messages sit until morning</b><span>By then the appointment is booked somewhere else.</span></div>
+      </div>
+    </div></div>
+  </section>
+
+  <section id="how">
+    <div class="wrap"><div class="thread">
+      <h2>How it works</h2>
+      <p class="sub">Four steps, and your staff do none of them.</p>
+      <ol class="steps">
+        <li><h3>A patient messages</h3><p>On WhatsApp or Instagram, at any hour.</p></li>
+        <li><h3>AI replies</h3><p>Fees, timings and location, in English, Hindi or Hinglish.</p></li>
+        <li><h3>The slot is booked</h3><p>The patient picks a free time without calling.</p></li>
+        <li><h3>You get the details</h3><p>Name, number, reason for the visit, and how serious the enquiry is.</p></li>
+      </ol>
+    </div></div>
+  </section>
+
+  <section id="services">
+    <div class="wrap"><div class="thread">
+      <h2>What we build for clinics</h2>
+      <p class="sub">Each piece runs on the WhatsApp and Instagram accounts you already use.</p>
+      <div class="services">
+        <article class="card"><span class="tag">Reply</span><h3>Instant replies</h3><p>Every enquiry gets a personal answer within a minute, with a human handover when it is needed.</p></article>
+        <article class="card"><span class="tag">Book</span><h3>Appointment booking</h3><p>Patients choose a slot themselves and it lands in your calendar.</p></article>
+        <article class="card"><span class="tag">Remind</span><h3>Visit reminders</h3><p>Automatic messages before each appointment, so fewer patients miss them.</p></article>
+        <article class="card"><span class="tag">Follow up</span><h3>Follow-ups</h3><p>People who enquired but never booked hear from you again.</p></article>
+      </div>
+    </div></div>
+  </section>
+
+  <section id="demo">
+    <div class="wrap"><div class="thread">
+      <h2>See a reply arrive</h2>
+      <p class="sub">Pick a question a patient might send. This is a simulation of the kind of reply the system writes.</p>
+      <div class="demo">
+        <div>
+          <span class="pill">Demo result</span>
+          <div class="figure">5<small>seconds</small></div>
+          <p class="sub" style="margin-top:16px">In our own test, a new enquiry was saved, scored and answered in 5 seconds. This is a demo figure, not a client result.</p>
+        </div>
+        <div class="phone">
+          <div class="phone-head"><span>Clinic inbox</span><span>Simulation</span></div>
+          <div class="chat" id="chat" aria-live="polite">
+            <div class="msg in">Hello, is an appointment available tomorrow?</div>
+            <div class="msg out">Yes. Slots are open at 11 AM and 5 PM tomorrow. Shall I book one for you?</div>
+            <div class="msg meta">Replied in 20 sec</div>
+          </div>
+          <div class="chips" id="chips">
+            <button class="chip" type="button" id="q-fees" data-q="fees">Fees kitni hai?</button>
+            <button class="chip" type="button" id="q-sunday" data-q="sunday">Open on Sunday?</button>
+            <button class="chip" type="button" id="q-where" data-q="where">Where is the clinic?</button>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </section>
+
+  <section id="start">
+    <div class="wrap"><div class="thread">
+      <h2>You pay after you see it work</h2>
+      <p class="sub">We are a new studio, so we let the results speak before any fee.</p>
+      <div class="start">
+        <div><p class="when">Day 0</p><h3>Free demo call</h3><p>15 minutes on Google Meet. We show the system on your kind of enquiries.</p></div>
+        <div><p class="when">Days 1 to 14</p><h3>Free trial</h3><p>It runs on your real enquiries against a target we agree in writing.</p></div>
+        <div><p class="when">After the trial</p><h3>Go live, or stop</h3><p>If the target is met, you continue on a monthly plan. If not, we switch it off.</p></div>
+      </div>
+    </div></div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap"><div class="thread">
+      <h2>Questions clinics ask</h2>
+      <div class="faq">
+        <details open><summary>Do we need new software or a new number?</summary><p>You keep your Instagram page. WhatsApp automation needs the official WhatsApp Business API, which uses a number that is not on the ordinary WhatsApp app. We set that up with you.</p></details>
+        <details><summary>Will the AI give medical advice?</summary><p>No. It answers practical questions such as fees, timings, location and booking, and passes anything medical to your staff.</p></details>
+        <details><summary>What does it cost?</summary><p>It depends on the clinic and the channels you use. We explain it on the demo call, and the 14-day trial is free.</p></details>
+        <details><summary>Which clinics have you worked with?</summary><p>We are new and say so. That is why the trial comes first and the fee comes later.</p></details>
+        <details><summary>What happens to patient data?</summary><p>We collect only what is needed to book the visit, message only people who contacted you, and stop when someone asks.</p></details>
+      </div>
+    </div></div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="wrap"><div class="thread">
+      <h2>See it on your clinic's enquiries</h2>
+      <p class="sub" id="contact-line">Send <span class="keyword">DEMO</span> to our Instagram page and we will share a time for a free 15-minute call.</p>
+      <div class="cta-row"><a class="btn" href="#top" id="contact-btn">Back to top</a></div>
+    </div></div>
+  </section>
+</main>
+
+<footer><div class="wrap"><span>&copy; 2026 aiautoflow.io</span><span>AI automation for clinics</span></div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+  // Set these two when they exist; empty values keep the Instagram instruction.
+  var BOOKING_URL = "https://sahil8090.app.n8n.cloud/form/aiautoflow-demo";
+  var INSTAGRAM_URL = "";
+
+  if (BOOKING_URL) {
+    document.querySelectorAll("[data-book]").forEach(function (a) { a.href = BOOKING_URL; a.target = "_blank"; a.rel = "noopener"; });
+    var cb = document.getElementById("contact-btn");
+    cb.href = BOOKING_URL; cb.target = "_blank"; cb.rel = "noopener"; cb.textContent = "Pick a time";
+    document.getElementById("contact-line").textContent = "Book a free 15-minute call on Google Meet. Choose any slot that suits you.";
+  } else if (INSTAGRAM_URL) {
+    var ib = document.getElementById("contact-btn");
+    ib.href = INSTAGRAM_URL; ib.target = "_blank"; ib.rel = "noopener"; ib.textContent = "Open our Instagram";
+  }
+
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Simulated inbox
+  var REPLIES = {
+    fees: ["Fees kitni hai consultation ki?", "Consultation fee Rs 500 hai. Kal ka slot book kar doon?"],
+    sunday: ["Is the clinic open on Sunday?", "Yes, on Sunday from 10 AM to 1 PM. Would you like me to book a time?"],
+    where: ["Where is the clinic?", "We are near the main bus stand, first floor. I can send the map link and book your visit. Which day suits you?"]
+  };
+  var chat = document.getElementById("chat"), busy = false;
+  function add(cls, text) {
+    var d = document.createElement("div"); d.className = "msg " + cls; d.textContent = text; chat.appendChild(d);
+    while (chat.children.length > 6) chat.removeChild(chat.firstChild);
+  }
+  document.getElementById("chips").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-q]"); if (!b || busy) return;
+    var r = REPLIES[b.getAttribute("data-q")]; busy = true; add("in", r[0]);
+    setTimeout(function () { add("out", r[1]); add("meta", "Replied in 1 sec (simulation)"); busy = false; }, reduce ? 0 : 900);
+  });
+
+  // Card tilt
+  if (!reduce && window.matchMedia("(hover: hover)").matches) {
+    document.querySelectorAll(".card").forEach(function (c) {
+      c.addEventListener("pointermove", function (e) {
+        var r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+        c.style.transform = "rotateY(" + (x * 10).toFixed(2) + "deg) rotateX(" + (-y * 10).toFixed(2) + "deg) translateZ(6px)";
+      });
+      c.addEventListener("pointerleave", function () { c.style.transform = ""; });
+    });
+  }
+
+  // 3D flow
+  var stage = document.getElementById("stage");
+  function fail() { document.getElementById("fallback").hidden = false; stage.querySelector(".stage-note").hidden = true; }
+  if (!window.THREE) { fail(); return; }
+  try {
+    var T = window.THREE;
+    var renderer = new T.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    stage.insertBefore(renderer.domElement, stage.firstChild);
+    var scene = new T.Scene();
+    var camera = new T.PerspectiveCamera(40, 1, 0.1, 100);
+    scene.add(new T.AmbientLight(0xffffff, 0.75));
+    var sun = new T.DirectionalLight(0xffffff, 0.9); sun.position.set(3, 5, 8); scene.add(sun);
+    var glow = new T.PointLight(0x4f8dff, 1.4, 20); glow.position.set(-1, 0, 4); scene.add(glow);
+
+    var flow = new T.Group(); scene.add(flow);
+    var NODES = [
+      { name: "Enquiry", p: [-4.2, 1.2, 0] },
+      { name: "AI reply", p: [-1.3, -0.4, 1.2], hot: true },
+      { name: "Score", p: [1.4, 1.7, -0.8] },
+      { name: "Booking", p: [1.7, -1.5, 0.8] },
+      { name: "Sheet", p: [4.3, 0.2, -0.3] }
+    ];
+    var EDGES = [[0, 1], [1, 2], [1, 3], [2, 4], [3, 4]];
+    var box = new T.BoxGeometry(1.9, 0.95, 0.3), edgeGeo = new T.EdgesGeometry(box);
+
+    function label(text, hot) {
+      var c = document.createElement("canvas"); c.width = 512; c.height = 256;
+      var g = c.getContext("2d");
+      g.font = "500 78px 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace";
+      g.textAlign = "center"; g.textBaseline = "middle"; g.fillStyle = hot ? "#071528" : "#F2F6FC";
+      g.fillText(text, 256, 132);
+      var tex = new T.CanvasTexture(c); tex.anisotropy = 4;
+      var s = new T.Sprite(new T.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+      s.scale.set(1.8, 0.9, 1); s.position.z = 0.22; return s;
+    }
+    var meshes = NODES.map(function (n) {
+      var grp = new T.Group(); grp.position.set(n.p[0], n.p[1], n.p[2]);
+      grp.add(new T.Mesh(box, new T.MeshStandardMaterial({ color: n.hot ? 0x4f8dff : 0x16345f, roughness: 0.45, metalness: 0.15 })));
+      grp.add(new T.LineSegments(edgeGeo, new T.LineBasicMaterial({ color: n.hot ? 0xffffff : 0x4f8dff })));
+      grp.userData.base = n.p[1]; grp.userData.node = n; flow.add(grp); return grp;
+    });
+    function labels() { meshes.forEach(function (m) { m.add(label(m.userData.node.name, m.userData.node.hot)); }); draw(); }
+    if (document.fonts && document.fonts.load) {
+      document.fonts.load("500 78px 'JetBrains Mono'").then(labels, labels);
+    } else { setTimeout(labels, 0); }
+
+    var pulses = EDGES.map(function (e, i) {
+      var a = new T.Vector3().fromArray(NODES[e[0]].p), b = new T.Vector3().fromArray(NODES[e[1]].p);
+      var mid = a.clone().add(b).multiplyScalar(0.5); mid.z += 0.9; mid.y += (i % 2 ? -0.35 : 0.35);
+      var curve = new T.QuadraticBezierCurve3(a, mid, b);
+      flow.add(new T.Mesh(new T.TubeGeometry(curve, 40, 0.028, 8), new T.MeshBasicMaterial({ color: 0x4f8dff, transparent: true, opacity: 0.45 })));
+      var dot = new T.Mesh(new T.SphereGeometry(0.1, 16, 16), new T.MeshBasicMaterial({ color: 0xffffff }));
+      flow.add(dot); return { curve: curve, dot: dot, t: i * 0.22, speed: 0.28 + i * 0.03 };
+    });
+
+    var N = 260, pos = new Float32Array(N * 3);
+    for (var i = 0; i < N; i++) { pos[i * 3] = (Math.random() - 0.5) * 18; pos[i * 3 + 1] = (Math.random() - 0.5) * 11; pos[i * 3 + 2] = (Math.random() - 0.5) * 10 - 2; }
+    var pg = new T.BufferGeometry(); pg.setAttribute("position", new T.BufferAttribute(pos, 3));
+    var dust = new T.Points(pg, new T.PointsMaterial({ color: 0xa9bad3, size: 0.045, transparent: true, opacity: 0.55 }));
+    scene.add(dust);
+
+    var mx = 0, my = 0, tx = 0, ty = 0;
+    window.addEventListener("pointermove", function (e) { tx = e.clientX / window.innerWidth - 0.5; ty = e.clientY / window.innerHeight - 0.5; });
+
+    function size() {
+      var w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return;
+      renderer.setSize(w, h, false); camera.aspect = w / h;
+      camera.position.set(0, 0, 12.5 / Math.min(1, camera.aspect / 1.2)); camera.updateProjectionMatrix(); draw();
+    }
+    var time = 0;
+    function place() {
+      mx += (tx - mx) * 0.05; my += (ty - my) * 0.05;
+      flow.rotation.y = Math.sin(time * 0.25) * 0.22 + mx * 0.5;
+      flow.rotation.x = 0.06 + my * 0.25;
+      meshes.forEach(function (m, k) { m.position.y = m.userData.base + Math.sin(time * 0.9 + k * 1.3) * 0.09; });
+      pulses.forEach(function (p) { p.dot.position.copy(p.curve.getPoint(p.t % 1)); });
+      dust.rotation.y = time * 0.015;
+    }
+    function draw() { place(); renderer.render(scene, camera); }
+    var running = false, last = 0;
+    function frame(now) {
+      if (!running) return;
+      var dt = Math.min(0.05, (now - last) / 1000 || 0); last = now; time += dt;
+      pulses.forEach(function (p) { p.t += dt * p.speed; });
+      draw(); requestAnimationFrame(frame);
+    }
+    if (window.ResizeObserver) { new ResizeObserver(size).observe(stage); } else { window.addEventListener("resize", size); }
+    size();
+    if (reduce) {
+      pulses.forEach(function (p, k) { p.t = 0.3 + k * 0.1; }); draw();
+    } else if (window.IntersectionObserver) {
+      new IntersectionObserver(function (en) {
+        var on = en[0].isIntersecting;
+        if (on && !running) { running = true; last = performance.now(); requestAnimationFrame(frame); } else if (!on) { running = false; }
+      }).observe(stage);
+    } else { running = true; requestAnimationFrame(frame); }
+  } catch (err) { fail(); }
+})();
+</script>
+
+</body>
+</html>
